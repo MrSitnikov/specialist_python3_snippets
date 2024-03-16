@@ -3,22 +3,47 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound
 from MainApp.models import Snippet
+from MainApp.forms import SnippetForm
 
 
 def index_page(request):
-    print('test1')
     context = {'pagename': 'PythonBin'}
     return render(request, 'pages/index.html', context)
 
 
 def add_snippet_page(request):
-    print('test2')
-    context = {'pagename': 'Добавление нового сниппета'}
-    return render(request, 'pages/add_snippet.html', context)
+    if request.method == 'GET':
+        form = SnippetForm()
+        context = {
+            'pagename': 'Добавление нового сниппета',
+            'form':form}
+        return render(request, 'pages/add_snippet.html', context)
+    else:
+        form = SnippetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("snippets_page")
+        return render(request, 'add_snippet.html', {'form': form})
+
+
+def deleteSnippet(request, snip_id):
+    #student = get_object_or_404(Student, id=id)
+    if request.method == 'GET':
+        get_snip = Snippet.objects.get(pk=snip_id)
+        get_snip.delete()
+        return redirect('snippets_page')
+    return render(request, 'pages/view_snippets.html', snippets_page)
+
+# def create_snippet(request):
+#    if request.method == "POST":
+#        form = SnippetForm(request.POST)
+#        if form.is_valid():
+#            form.save()
+#            return redirect("snippets_page")
+#        return render(request, 'add_snippet.html', {'form': form})
 
 
 def snippets_page(request):
-    print('test3')
     snipets = Snippet.objects.all()
     context = {'pagename': 'Просмотр сниппетов','snipets_dic': snipets}
     return render(request, 'pages/view_snippets.html', context)

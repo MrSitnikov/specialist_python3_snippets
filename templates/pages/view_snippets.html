@@ -27,6 +27,7 @@
                         <th scope="col">ID</th>
                         <th scope="col">Название</th>
                         <th scope="col">Дата создания</th>
+                        <th scope="col">Удалить</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -35,6 +36,7 @@
                             <td scope="row"> {{snip.id}} </td>
                             <td><a href="{% url 'snippets_info_page' snip.id %}"> {{snip.name}} </a></td>
                             <td> {{snip.creation_date}} </td>
+                            <td><a href="{% url 'deleteSnippet' snip.id %}"> Удалить </a></td>
                         </tr>
                     {% endfor %}   
                     </tbody>
