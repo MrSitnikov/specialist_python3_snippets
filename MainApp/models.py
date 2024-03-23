@@ -15,5 +15,11 @@ class Snippet(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE,
                             blank=True, null=True)
     
-class User(models.Model):
-    username = models.CharField(max_length=32)
+
+class Comment(models.Model):
+   text = models.TextField(max_length=5000)
+   creation_date = models.DateTimeField(auto_now=True)
+   author = models.ForeignKey(to=User, on_delete=models.CASCADE,
+                              blank=True, null=True)
+   snippet = models.ForeignKey(to=Snippet, on_delete=models.CASCADE,
+                               blank=True, null=True)

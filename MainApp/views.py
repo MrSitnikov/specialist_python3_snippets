@@ -2,8 +2,8 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponse
-from MainApp.models import Snippet
-from MainApp.forms import SnippetForm, UserRegistrationForm
+from MainApp.models import Snippet, Comment
+from MainApp.forms import SnippetForm, UserRegistrationForm, CommentForm
 from django.contrib import auth
 
 
@@ -70,7 +70,9 @@ def snippets_page(request):
 def get_snippets_info_page(request,snip_id):
     try:
         get_snip = Snippet.objects.get(pk=snip_id)
-        context = {'pagename': get_snip.name, 'snip_id_info': get_snip}
+        # auth.get_user(request)
+        form = CommentForm()
+        context = {'pagename': get_snip.name, 'snip_id_info': get_snip, 'form':form}
     except ObjectDoesNotExist:
         return HttpResponseNotFound(f"Snippet with id={snip_id} not found.")
     
@@ -81,10 +83,10 @@ def login(request):
    if request.method == 'POST':
         username = request.POST.get("username")
         password = request.POST.get("password")
-        print("username =", username)
+        #print("username =", username)
         # print("password =", password)
         user = auth.authenticate(request, username=username, password=password)
-        print(user)
+        #print(user)
         if user is not None:
             auth.login(request, user)
         else:
@@ -96,10 +98,8 @@ def logout(request):
     return redirect('home')
 
 def registration(request):
-    print(request.method)
     if request.method == "GET":
         form = UserRegistrationForm()
-        print(form.as_p)
         context = {
             'pagename': 'Регистрация',
             'form':form}
@@ -110,3 +110,19 @@ def registration(request):
             form.save()
             return redirect("home")
         return render(request, 'pages/register.html', {'form': form})
+
+
+def comment_add(request):
+    if request.method == "GET":
+        form = CommentForm()
+        context = {
+            'pagename': 'Коммент',
+            'form': form}
+        return render(request, 'pages/comments_add.html', context)
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = comment_form.cleaned_data['author']
+        #    comment.snippet = ...
+       #     comment.save()
